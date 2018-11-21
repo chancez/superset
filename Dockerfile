@@ -67,6 +67,9 @@ RUN \
 # Configure Filesystem
 COPY superset /usr/local/bin
 
+# patch helpers.py to fix export databases
+COPY helpers.py /usr/local/lib/python3.6/site-packages/superset/models/helpers.py
+
 VOLUME /home/superset \
        /etc/superset \
        /var/lib/superset
