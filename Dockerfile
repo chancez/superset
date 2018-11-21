@@ -17,12 +17,16 @@ ENV GUNICORN_BIND=0.0.0.0:8088 \
     SUPERSET_HOME=/var/lib/superset
 ENV GUNICORN_CMD_ARGS="--workers ${GUNICORN_WORKERS} --timeout ${GUNICORN_TIMEOUT} --bind ${GUNICORN_BIND} --limit-request-line ${GUNICORN_LIMIT_REQUEST_LINE} --limit-request-field_size ${GUNICORN_LIMIT_REQUEST_FIELD_SIZE}"
 
-# Create superset user & install dependencies
-RUN useradd -U -m superset && \
-    mkdir /etc/superset  && \
-    mkdir ${SUPERSET_HOME} && \
-    chown -R superset:superset /etc/superset && \
-    chown -R superset:superset ${SUPERSET_HOME} && \
+# Create superset user
+RUN useradd -u 1005 -m superset && \
+    mkdir -p \
+       /etc/superset \
+       ${SUPERSET_HOME} && \
+    chown -R 1005:0 /home/superset /etc/superset ${SUPERSET_HOME} && \
+    chmod -R 774 /home/superset /etc/superset ${SUPERSET_HOME} /etc/passwd
+
+# install dependencies
+RUN \
     apt-get update && \
     apt-get install -y \
         build-essential \
@@ -62,10 +66,13 @@ RUN useradd -U -m superset && \
 
 # Configure Filesystem
 COPY superset /usr/local/bin
+
 VOLUME /home/superset \
        /etc/superset \
        /var/lib/superset
 WORKDIR /home/superset
+
+USER 1005
 
 # Deploy application
 EXPOSE 8088
