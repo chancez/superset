@@ -197,7 +197,7 @@ class ImportMixin(object):
                             include_defaults=include_defaults,
                         ) for child in getattr(self, c)
                     ],
-                    key=lambda k: sorted(k.items(), key=operator.itemgetter(1)))
+                    key=lambda k: (k.items()))
 
         return dict_rep
 
